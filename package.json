@@ -1,0 +1,27 @@
+{
+  "name": "anc-aqal-nourishment-centre",
+  "version": "6.8.0",
+  "description": "ANC (Aqal Nourishment Centre) - AI-powered nutrition assistant web application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "nutrition",
+    "ai",
+    "health",
+    "food-scanner",
+    "noura"
+  ],
+  "author": "ANC Team",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0",
+    "compression": "^1.7.4",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
+  }
+}

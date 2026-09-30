@@ -1,0 +1,25 @@
+[build]
+  command = "npm install"
+  publish = "public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# 6.8: same-origin scanner proxy (needs HF_TOKEN set in Netlify env vars)
+[[redirects]]
+  from = "/api/scan"
+  to = "/.netlify/functions/scan"
+  status = 200
+
+# 6.8+: Gemini smart scan (needs GEMINI_KEY set in Netlify env vars)
+[[redirects]]
+  from = "/api/gemini-scan"
+  to = "/.netlify/functions/gemini-scan"
+  status = 200
+
+# 6.8+: Gemini text chat (needs GEMINI_KEY set in Netlify env vars)
+[[redirects]]
+  from = "/api/ai-chat"
+  to = "/.netlify/functions/ai-chat"
+  status = 200

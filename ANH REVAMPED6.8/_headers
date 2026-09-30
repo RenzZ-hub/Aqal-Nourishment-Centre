@@ -1,0 +1,17 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(), geolocation=()
+
+/index.html
+  Cache-Control: no-cache, must-revalidate
+
+/script.js
+/style.css
+/fa-subset.css
+/*.jpg
+/*.jpeg
+/*.png
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable

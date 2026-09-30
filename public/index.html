@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANC — Aqal Nourishment Centre</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='6'%20fill='%237A9E45'/%3E%3Cg%20stroke='white'%20stroke-width='2'%20stroke-linecap='round'%20fill='none'%3E%3Cpath%20d='M12%203.6%205.6%2019'/%3E%3Cpath%20d='M12%203.6%2018.4%2019'/%3E%3Cpath%20d='M7.4%2013.5h1.8l1.3-2.6%201.6%205.2%201.3-2.6h1.8'/%3E%3C/g%3E%3Cg%20fill='white'%3E%3Ccircle%20cx='12'%20cy='3.6'%20r='2.7'/%3E%3Ccircle%20cx='5.6'%20cy='19'%20r='2.7'/%3E%3Ccircle%20cx='18.4'%20cy='19'%20r='2.7'/%3E%3C/g%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="js/script.js" as="script">
+<link rel="stylesheet" href="css/fa-subset.css">
+
+<link rel="stylesheet" href="css/style.css">
+<script>
+(function(){try{var raw=localStorage.getItem("anc_lang");var resolved;if(raw==="id"||raw==="en"){resolved=raw;}else{var bl=(navigator.language||navigator.userLanguage||"").toLowerCase();resolved=(bl.indexOf("id")===0)?"id":"en";try{localStorage.setItem("anc_lang","auto");}catch(e){}}document.documentElement.lang=resolved;document.documentElement.setAttribute("data-lang",resolved);}catch(e){}})();
+</script>
+<script>
+/* Motion preference must be applied before first paint.
+   Priority: saved user choice > system Reduce Motion setting. */
+(function () {
+  try {
+    var saved = localStorage.getItem("anc_reduce_motion");
+    var system = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var reduce = saved === "1" ? true : (saved === "0" ? false : !!system);
+    document.documentElement.classList.add("motion-managed");
+    document.documentElement.classList.toggle("motion-reduced", reduce);
+  } catch (e) { document.documentElement.classList.add("motion-managed"); }
+})();
+/* Theme is resolved before first paint to avoid a flash.
+   data-theme stores the user's choice: dark | light | auto.
+   data-theme-eff carries the resolved value applied by CSS. */
+(function () {
+  var theme = "dark";
+  var eff = "dark";
+  var mqDark = null;
+  try {
+    theme = localStorage.getItem("anc_theme") || "dark";
+    var mq = window.matchMedia && matchMedia("(prefers-color-scheme: dark)");
+    if (theme === "auto" && mq) { mqDark = mq; eff = mq.matches ? "dark" : "light"; }
+    else if (theme === "light") { eff = "light"; }
+    else { eff = "dark"; }
+  } catch (e) {}
+  var root = document.documentElement;
+  root.setAttribute("data-theme", theme);
+  root.setAttribute("data-theme-eff", eff);
+  if (mqDark) {
+    try {
+      mqDark.addEventListener("change", function (ev) {
+        if ((document.documentElement.getAttribute("data-theme")) === "auto") {
+          document.documentElement.setAttribute("data-theme-eff", ev.matches ? "dark" : "light");
+        }
+      });
+    } catch (e2) {}
+  }
+})();
+</script>
+</head>
+<body>
+
+<!-- =========================================================
+     BACKGROUND MOTIF — themed floating glyphs + nutrient dust
+========================================================= -->
+<div class="bg-motif" aria-hidden="true">
+  <i class="fa-solid fa-bolt"            style="--x:8%;  --y:14%; --d:0s;  --s:1"></i>
+  <i class="fa-solid fa-seedling"        style="--x:90%; --y:9%;  --d:1.2s;--s:.8"></i>
+  <i class="fa-solid fa-heart-pulse"     style="--x:13%; --y:58%; --d:2.4s;--s:.9"></i>
+  <i class="fa-solid fa-fire"            style="--x:89%; --y:54%; --d:.6s; --s:1.1"></i>
+  <i class="fa-solid fa-bullseye"        style="--x:34%; --y:30%; --d:1.8s;--s:.7"></i>
+  <i class="fa-solid fa-robot"           style="--x:66%; --y:24%; --d:3s;  --s:.85"></i>
+  <i class="fa-solid fa-sparkles"        style="--x:24%; --y:84%; --d:2s;  --s:1"></i>
+  <i class="fa-solid fa-arrow-trend-up"  style="--x:76%; --y:78%; --d:3.6s;--s:.9"></i>
+  <span class="nutri-dust" style="--x:18%; --d:0s;"></span>
+  <span class="nutri-dust" style="--x:42%; --d:2s;"></span>
+  <span class="nutri-dust" style="--x:63%; --d:4.5s;"></span>
+  <span class="nutri-dust" style="--x:81%; --d:6s;"></span>
+  <span class="nutri-dust" style="--x:30%; --d:8s;"></span>
+  <span class="nutri-dust" style="--x:72%; --d:3s;"></span>
+</div>
+
+<!-- =========================================================
+     PRELOADER — hides the moment the page is ready
+========================================================= -->
+<div id="preloader" class="preloader" aria-hidden="false" role="status" aria-live="polite">
+  <div class="preloader-bg"></div>
+  <div class="preloader-inner">
+    <div class="preloader-mark">
+      <svg class="anc-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.6 L5.6 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 3.6 L18.4 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7.4 13.5 H9.2 L10.5 10.9 L12.1 16.1 L13.4 13.5 H16.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="3.6" r="2.7" fill="currentColor"/><circle cx="5.6" cy="19" r="2.7" fill="currentColor"/><circle cx="18.4" cy="19" r="2.7" fill="currentColor"/></svg>
+      <span class="preloader-orbit"></span>
+    </div>
+    <div class="preloader-label">ANC</div>
+    <div class="preloader-sub">Aqal Nourishment Centre</div>
+    <div class="preloader-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<div class="ambient ambient-one"></div>
+<div class="ambient ambient-two"></div>
+<div class="ambient ambient-three"></div>
+
+<!-- =========================================================
+     AUTHENTICATION GATE
+========================================================= -->
+<div id="authScreen" class="auth-screen hidden" style="display:none">
+  <div class="auth-orb auth-orb-one"></div>
+  <div class="auth-orb auth-orb-two"></div>
+
+  <div class="auth-card">
+    <button type="button" id="authExitBtn" class="auth-exit" aria-label="Cancel sign in"><i class="fa-solid fa-xmark"></i></button>
+
+    <div class="auth-brand">
+      <div class="auth-brand-icon"><svg class="anc-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3.6 L5.6 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 3.6 L18.4 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M7.4 13.5 H9.2 L10.5 10.9 L12.1 16.1 L13.4 13.5 H16.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="3.6" r="2.7" fill="currentColor"/><circle cx="5.6" cy="19" r="2.7" fill="currentColor"/><circle cx="18.4" cy="19" r="2.7" fill="currentColor"/></svg></div>
+      <div><strong>ANC</strong><span>Aqal Nourishment Centre</span></div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm" class="auth-form">
+      <div class="auth-heading">
+        <span class="auth-label">WELCOME BACK</span>
+        <h1>Your nutrition, <em>understood.</em></h1>
+        <p>Sign in to continue to your personal AI nutrition assistant.</p>
+      </div>
+
+      <div class="auth-field">
+        <label>Email</label>
+        <div class="auth-input">
+          <i class="fa-regular fa-envelope"></i>
+          <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label>Password</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password">
+          <button type="button" class="password-toggle" data-password="loginPassword"><i class="fa-regular fa-eye"></i></button>
+        </div>
+      </div>
+
+      <div class="auth-options">
+        <label class="remember-me"><input type="checkbox" id="rememberMe"><span>Remember me</span></label>
+        <button type="button" id="forgotPasswordBtn">Forgot password?</button>
+      </div>
+
+      <button class="auth-submit" id="loginBtn">Sign in <i class="fa-solid fa-arrow-right"></i></button>
+
+      <div class="auth-divider"><span>or</span></div>
+
+      <button class="google-auth" id="googleLoginBtn"><i class="fa-brands fa-google"></i>Continue with Google</button>
+
+      <p class="auth-switch">Don't have an account? <button type="button" id="showSignupBtn">Create account</button></p>
+    </div>
+
+    <!-- SIGN UP -->
+    <div id="signupForm" class="auth-form" style="display:none;">
+      <div class="auth-heading">
+        <span class="auth-label">GET STARTED</span>
+        <h1>Build a healthier <em>you.</em></h1>
+        <p>Create your ANC account and start understanding your nutrition.</p>
+      </div>
+
+      <div class="auth-field">
+        <label>Full name</label>
+        <div class="auth-input">
+          <i class="fa-regular fa-user"></i>
+          <input type="text" id="signupName" placeholder="Your name" autocomplete="name">
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label>Email</label>
+        <div class="auth-input">
+          <i class="fa-regular fa-envelope"></i>
+          <input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label>Password</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="signupPassword" placeholder="Create a password" autocomplete="new-password">
+          <button type="button" class="password-toggle" data-password="signupPassword"><i class="fa-regular fa-eye"></i></button>
+        </div>
+      </div>
+
+      <button class="auth-submit" id="signupBtn">Create account <i class="fa-solid fa-arrow-right"></i></button>
+
+      <div class="auth-divider"><span>or</span></div>
+
+      <button class="google-auth" id="googleSignupBtn"><i class="fa-brands fa-google"></i>Sign up with Google</button>
+
+      <p class="auth-switch">Already have an account? <button type="button" id="showLoginBtn">Sign in</button></p>
+    </div>
+
+    <!-- PROFILE (post-signup) -->
+    <div id="profileForm" class="auth-form" style="display:none;">
+      <div class="auth-heading">
+        <span class="auth-label">ALMOST DONE</span>
+        <h1>Tell us a little <em>about you.</em></h1>
+        <p>Help Noura give you more personalised nutrition guidance. Most fields are optional.</p>
+      </div>
+
+      <div class="auth-field">
+        <label>Age</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-cake-candles"></i>
+          <input type="number" id="profileAge" min="1" max="120" placeholder="Your age" autocomplete="bday">
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label data-i18n="auth.profile.weightLabel">Weight (kg) — optional</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-weight-scale"></i>
+          <input type="number" id="profileWeight" min="20" max="400" data-i18n-placeholder="auth.profile.weightPlaceholder" placeholder="e.g. 70" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label>Tinggi Badan (cm) — optional</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-ruler-vertical"></i>
+          <input type="number" id="profileHeight" min="50" max="300" placeholder="e.g. 170" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label data-i18n="auth.profile.genderLabel">Gender</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-venus-mars"></i>
+          <select id="profileGender">
+            <option value="" data-i18n="auth.profile.prefer">Prefer not to say</option>
+            <option value="female" data-i18n="auth.profile.female">Female</option>
+            <option value="male" data-i18n="auth.profile.male">Male</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label data-i18n="auth.profile.religionLabel">Religion</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-moon"></i>
+          <select id="profileReligion">
+            <option value="" data-i18n="auth.profile.prefer">Prefer not to say</option>
+            <option value="muslim" data-i18n="auth.profile.muslim">Muslim</option>
+            <option value="non-muslim" data-i18n="auth.profile.nonMuslim">Non-Muslim</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="auth-field">
+        <label data-i18n="auth.profile.diseasesLabel">Diseases (optional)</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-heart-pulse"></i>
+          <input type="text" id="profileDiseases" data-i18n-placeholder="auth.profile.diseasesPlaceholder" placeholder="e.g. diabetes, hypertension">
+        </div>
+      </div>
+
+      <button class="auth-submit" id="profileSubmitBtn" data-i18n="auth.profile.finish">Finish setup <i class="fa-solid fa-check"></i></button>
+      <button type="button" class="auth-skip" id="profileSkipBtn" data-i18n="auth.profile.skip">Skip for now</button>
+    </div>
+
+    <div id="authMessage" class="auth-message"></div>
+
+    <div class="auth-footer"><i class="fa-solid fa-shield-halved"></i><span data-i18n="auth.footer">Your nutrition journey starts here</span></div>
+  </div>
+</div>
+
+<div id="profileModal" class="modal-overlay profile-overlay">
+  <div class="profile-card">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon"><i class="fa-solid fa-user-pen"></i></div>
+        <div><h3>Personalize Account</h3><span>Update your personal information</span></div>
+      </div>
+      <button id="closeProfileBtn" class="close-btn" type="button" aria-label="Close profile"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="scanner-body">
+      <div class="auth-field">
+        <label>Full name / Username</label>
+        <div class="auth-input">
+          <i class="fa-regular fa-user"></i>
+          <input type="text" id="editProfileName" placeholder="Your name">
+        </div>
+      </div>
+      <div class="sport-row">
+        <div class="sport-field" style="margin-bottom:0">
+          <label style="display:block;margin-bottom:6px;color:rgba(255,255,255,.55);font-size:13px;font-weight:600">Age</label>
+          <div class="auth-input">
+            <i class="fa-solid fa-cake-candles"></i>
+            <input type="number" id="editProfileAge" min="1" max="120" placeholder="e.g. 25">
+          </div>
+        </div>
+        <div class="sport-field" style="margin-bottom:0">
+          <label style="display:block;margin-bottom:6px;color:rgba(255,255,255,.55);font-size:13px;font-weight:600">Gender</label>
+          <div class="auth-input">
+            <i class="fa-solid fa-venus-mars"></i>
+            <select id="editProfileGender">
+              <option value="">Prefer not to say</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="sport-row" style="margin-top:12px">
+        <div class="sport-field" style="margin-bottom:0">
+          <label style="display:block;margin-bottom:6px;color:rgba(255,255,255,.55);font-size:13px;font-weight:600">Weight (kg)</label>
+          <div class="auth-input">
+            <i class="fa-solid fa-weight-scale"></i>
+            <input type="number" id="editProfileWeight" min="20" max="400" placeholder="e.g. 70">
+          </div>
+        </div>
+        <div class="sport-field" style="margin-bottom:0">
+          <label style="display:block;margin-bottom:6px;color:rgba(255,255,255,.55);font-size:13px;font-weight:600">Height (cm)</label>
+          <div class="auth-input">
+            <i class="fa-solid fa-ruler-vertical"></i>
+            <input type="number" id="editProfileHeight" min="50" max="300" placeholder="e.g. 170">
+          </div>
+        </div>
+      </div>
+      <div class="auth-field" style="margin-top:12px">
+        <label>Religion</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-moon"></i>
+          <select id="editProfileReligion">
+            <option value="">Prefer not to say</option>
+            <option value="muslim">Muslim</option>
+            <option value="non-muslim">Non-Muslim</option>
+          </select>
+        </div>
+      </div>
+      <div class="auth-field">
+        <label>Allergies / Health Issues (if any)</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-heart-pulse"></i>
+          <input type="text" id="editProfileDiseases" placeholder="e.g. peanut allergy, diabetes">
+        </div>
+      </div>
+      <div id="profileModalMessage" class="auth-message" style="margin-top:8px"></div>
+      <div class="scanner-actions" style="margin-top:14px;grid-template-columns:1fr 1fr">
+        <button id="logoutBtn" class="scanner-btn secondary" type="button"><i class="fa-solid fa-right-from-bracket"></i> Log out</button>
+        <button id="saveProfileBtn" class="scanner-btn primary" type="button" style="grid-column:auto"><i class="fa-solid fa-floppy-disk"></i> Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+<header class="navbar">
+  <!-- HAMBURGER MENU -->
+  <button class="hamburger-btn" id="hamburgerBtn" type="button" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <a href="#home" class="brand"><span class="brand-icon anc-logo"><img src="images/logo-dark.webp" alt="ANC Logo" class="logo-dark" width="32" height="32" loading="eager" onerror="this.onerror=null;this.src='images/logo-dark.jpg'"><img src="images/logo-light.webp" alt="ANC Logo" class="logo-light" width="32" height="32" loading="eager" onerror="this.onerror=null;this.src='images/logo-light.jpg'"></span><span class="brand-text"><span class="brand-name">ANC</span><span class="brand-sub">Aqal Nourishment Centre</span></span></a>
+  <nav class="nav-links">
+    <a href="#home" class="active" data-i18n="nav.home">Home</a>
+    <a href="#features" data-i18n="nav.features">Features</a>
+    <a href="#about" data-i18n="nav.about">About</a>
+    <a href="#scanner" data-open-scanner data-i18n="nav.scanner">Scanner</a>
+  </nav>
+  <div class="nav-right">
+    <span class="online-status"><span></span><span data-i18n="nav.available">Available</span></span>
+    <button class="nav-signup" id="navSignupBtn" data-i18n="nav.signup">Sign up</button>
+    <button class="nav-contact" id="navChatBtn" data-i18n="nav.tryNow">Try Now!</button>
+    <button class="nav-profile-btn" id="navProfileBtn" type="button" aria-label="Profile" style="display:none"><i class="fa-solid fa-user"></i><span id="navProfileName"></span></button>
+  </div>
+</header>
+
+<main id="home">
+<section class="hero">
+  <div class="announcement" data-reveal>
+    <span class="announcement-badge"><i class="fa-solid fa-wand-magic-sparkles"></i><span data-i18n="hero.badge">New</span></span>
+    <span data-i18n="hero.badgeText">AI-powered nutrition is now available</span>
+  </div>
+
+  <h1 class="hero-title" data-i18n="hero.title">Transform Your <span class="hero-line">Health With <em>ANC</em></span></h1>
+
+  <p class="hero-description">    <span data-i18n="hero.desc">Understand your food, improve your nutrition, and build healthier habits with your intelligent AI-powered nutrition companion.</span>
+  </p>
+
+  <div class="hero-buttons">
+    <button class="primary-button" id="heroStartBtn" data-i18n="hero.start">Start analyzing <i class="fa-solid fa-arrow-right"></i></button>
+    <button class="text-button" id="heroDemoBtn" data-i18n="hero.ask">Ask the AI <i class="fa-solid fa-arrow-right"></i></button>
+  </div>
+
+  <div class="benefit-row">
+    <div class="benefit">
+      <div class="benefit-icon"><i class="fa-solid fa-bolt"></i></div>
+      <div><strong data-i18n="hero.b1Title">Instant analysis</strong><span data-i18n="hero.b1Sub">AI-powered results</span></div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon"><i class="fa-solid fa-camera"></i></div>
+      <div><strong data-i18n="hero.b2Title">Food scanner</strong><span data-i18n="hero.b2Sub">Scan meals instantly</span></div>
+    </div>
+    <div class="benefit">
+      <div class="benefit-icon"><i class="fa-solid fa-chart-pie"></i></div>
+      <div><strong data-i18n="hero.b3Title">Macro insights</strong><span data-i18n="hero.b3Sub">Protein, carbs & fat</span></div>
+    </div>
+  </div>
+
+  <div class="liquid-stage">
+    <div class="liquid-glow"></div>
+    <div class="liquid-shape liquid-back"></div>
+    <div class="liquid-shape liquid-middle"></div>
+    <div class="liquid-shape liquid-front"></div>
+    <div class="liquid-highlight"></div>
+  </div>
+</section>
+
+<section class="features-section" id="features">
+  <h2 data-reveal data-i18n="features.heading">Unlock the full potential of <em>your nutrition</em></h2>
+  <p class="section-description" data-reveal>    <span data-i18n="features.sub">ANC gives you intelligent tools and simple insights to understand what you eat and make better everyday decisions.</span>
+  </p>
+
+  <div class="feature-grid" data-reveal-stagger>
+    <article class="feature-card">
+      <div class="feature-icon blue"><i class="fa-solid fa-camera"></i></div>
+      <h3 data-i18n="features.card1Title">AI Food Scanner</h3>
+      <p data-i18n="features.card1Desc">Take a photo of your meal and let AI identify the food and estimate its nutritional information.</p>
+      <button class="feature-link" data-open-scanner data-i18n="features.card1Btn">Try scanner <i class="fa-solid fa-arrow-right"></i></button>
+    </article>
+
+    <article class="feature-card">
+      <div class="feature-icon purple"><i class="fa-solid fa-chart-pie"></i></div>
+      <h3 data-i18n="features.card2Title">Macro Intelligence</h3>
+      <p data-i18n="features.card2Desc">See estimated protein, carbohydrates, fats and calories presented in an easy-to-understand visual breakdown.</p>
+      <button class="feature-link" id="macroInfoBtn" data-i18n="features.card2Btn">Explore nutrition <i class="fa-solid fa-arrow-right"></i></button>
+    </article>
+
+    <article class="feature-card">
+      <div class="feature-icon cyan"><i class="fa-solid fa-robot"></i></div>
+      <h3 data-i18n="features.card3Title">Noura AI Assistant</h3>
+      <p data-i18n="features.card3Desc">Ask questions about calories, meals, diets, healthy habits, and nutrition recommendations anytime.</p>
+      <button class="feature-link" id="featureChatBtn" data-i18n="features.card3Btn">Talk to Noura <i class="fa-solid fa-arrow-right"></i></button>
+    </article>
+
+    <article class="feature-card">
+      <div class="feature-icon orange"><i class="fa-solid fa-person-running"></i></div>
+      <h3 data-i18n="features.card4Title">Sport Predictor</h3>
+      <p data-i18n="features.card4Desc">Estimate how many calories you burn per step or kilometer, based on your activity, pace and weight.</p>
+      <button class="feature-link" data-open-sport data-i18n="features.card4Btn">Try predictor <i class="fa-solid fa-arrow-right"></i></button>
+    </article>
+
+    <article class="feature-card health-feature-card">
+      <div class="feature-icon green"><i class="fa-solid fa-heart-pulse"></i></div>
+      <h3 data-i18n="features.card5Title">Health Channel</h3>
+      <p data-i18n="features.card5Desc">Explore inspirations, inspirational books, Q&A and community conversations in the ANC Health Channel.</p>
+      <button class="feature-link" data-open-health data-i18n="features.card5Btn">Open health channel <i class="fa-solid fa-arrow-right"></i></button>
+    </article>
+
+    <article class="feature-card weight-feature-card">
+      <div class="feature-icon weight"><svg class="kg-icon" viewBox="0 0 40 28" aria-hidden="true"><path d="M6 26 L10 4 L30 4 L34 26 Z" fill="currentColor"/><text x="20" y="19" text-anchor="middle" font-size="8.5" font-weight="800" fill="white" font-family="Inter,sans-serif">KG</text></svg></div>
+      <h3>Gain Or Loss Weight</h3>
+      <p>Choose your goal — gain mass or cut fat. Get daily targets, varied meal plans and budget-friendly menus guided by your trainer Nolan.</p>
+      <button class="feature-link" data-open-weight>Open weight program <i class="fa-solid fa-arrow-right"></i></button>
+    </article>
+  </div>
+</section>
+
+<section class="about-section" id="about">
+  <div class="about-glass" data-reveal>
+    <div class="about-copy">
+      <h2 data-i18n="about.heading">Your food. <em>Understood.</em></h2>
+      <p data-i18n="about.desc">ANC merges artificial intelligence, food recognition, nutrition estimation and conversational assistance into one simple wellness experience — built to make knowing what you eat effortless.</p>
+      <div class="about-marks">
+        <span data-i18n="about.tag1"><i class="fa-solid fa-brain"></i>AI-driven</span>
+        <span data-i18n="about.tag2"><i class="fa-solid fa-camera"></i>Photo recognition</span>
+        <span data-i18n="about.tag3"><i class="fa-solid fa-comments"></i>Noura assistant</span>
+      </div>
+    </div>
+
+    <ol class="about-flow">
+      <li><span class="about-step-num">01</span><span class="about-step-icon"><i class="fa-solid fa-camera"></i></span><span><strong data-i18n="about.s1Title">Capture</strong><span class="about-step-text" data-i18n="about.s1Desc">Photograph any meal in seconds.</span></span></li>
+      <li><span class="about-step-num">02</span><span class="about-step-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span><strong data-i18n="about.s2Title">Understand</strong><span class="about-step-text" data-i18n="about.s2Desc">AI reads the food and estimates calories & macros.</span></span></li>
+      <li><span class="about-step-num">03</span><span class="about-step-icon"><i class="fa-solid fa-robot"></i></span><span><strong data-i18n="about.s3Title">Improve</strong><span class="about-step-text" data-i18n="about.s3Desc">Ask Noura anything and build healthier habits.</span></span></li>
+    </ol>
+  </div>
+</section>
+</main>
+
+<!-- =========================================================
+     HAMBURGER MENU DRAWER
+========================================================= -->
+<div id="menuOverlay" class="menu-overlay"></div>
+
+<aside id="sideMenu" class="side-menu" aria-hidden="true">
+  <div class="side-menu-header">
+    <div class="side-menu-brand">
+      <span class="brand-icon anc-logo"><img src="images/logo-dark.webp" alt="ANC Logo" class="logo-dark" width="32" height="32" loading="eager" onerror="this.onerror=null;this.src='images/logo-dark.jpg'"><img src="images/logo-light.webp" alt="ANC Logo" class="logo-light" width="32" height="32" loading="eager" onerror="this.onerror=null;this.src='images/logo-light.jpg'"></span>
+      <div><strong>ANC</strong><span>Aqal Nourishment Centre</span></div>
+    </div>
+    <button id="closeMenuBtn" class="close-btn" type="button" aria-label="Close menu">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <div class="side-menu-content">
+
+    <div id="sideMenuNav">
+    <span class="menu-label" data-i18n="menu.labelMenu">MENU</span>
+
+    <button class="menu-item" data-menu-target="#home">
+      <span class="menu-item-icon"><i class="fa-solid fa-house"></i></span>
+      <span><strong data-i18n="menu.homeTitle">Home</strong><small data-i18n="menu.homeSub">Back to the main page</small></span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <button class="menu-item" data-menu-target="#features">
+      <span class="menu-item-icon"><i class="fa-solid fa-grid-2"></i></span>
+      <span><strong data-i18n="menu.featuresTitle">Features</strong><small data-i18n="menu.featuresSub">Explore ANC tools</small></span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <button class="menu-item menu-health" data-open-health>
+      <span class="menu-item-icon"><i class="fa-solid fa-heart-pulse"></i></span>
+      <span><strong data-i18n="menu.healthTitle">Health Channel</strong><small data-i18n="menu.healthSub">Guides for everyday wellness</small></span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <button class="menu-item" data-open-scanner>
+      <span class="menu-item-icon"><i class="fa-solid fa-camera"></i></span>
+      <span><strong data-i18n="menu.scannerTitle">Food Scanner</strong><small data-i18n="menu.scannerSub">Analyze a meal with AI</small></span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <button class="menu-item" data-open-sport>
+      <span class="menu-item-icon"><i class="fa-solid fa-person-running"></i></span>
+      <span><strong data-i18n="menu.sportTitle">Sport Predictor</strong><small data-i18n="menu.sportSub">Estimate calories burned</small></span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <button class="menu-item" id="menuNouraBtn">
+      <span class="menu-item-icon"><i class="fa-solid fa-robot"></i></span>
+      <span><strong data-i18n="menu.nouraTitle">Noura Assistant</strong><small data-i18n="menu.nouraSub">Ask your nutrition questions</small></span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <div class="menu-divider"></div>
+    <span class="menu-label" data-i18n="menu.labelAbout">ABOUT</span>
+
+    <button class="menu-item" data-menu-target="#about">
+      <span class="menu-item-icon"><i class="fa-solid fa-circle-info"></i></span>
+      <span><strong data-i18n="menu.aboutTitle">About ANC</strong><small data-i18n="menu.aboutSub">Learn about the project</small></span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+
+    <div class="menu-divider"></div>
+    <span class="menu-label" data-i18n="menu.labelSettings">SETTINGS</span>
+
+    <button class="menu-item" id="settingsMenuBtn">
+      <span class="menu-item-icon"><i class="fa-solid fa-gear"></i></span>
+      <span><strong data-i18n="menu.settingsTitle">Settings</strong><small data-i18n="menu.settingsSub">Reduce motion & preferences</small></span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>
+    </div>
+
+    <div id="settingsPanel" class="settings-panel">
+      <div class="settings-header">
+        <button type="button" class="forum-back" id="settingsBackBtn" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
+        <div>
+          <span class="health-category" data-i18n="settings.prefs">PREFERENCES</span>
+          <h3 data-i18n="settings.title">Settings</h3>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-row">
+          <span class="settings-row-icon"><i class="fa-solid fa-circle-half-stroke"></i></span>
+          <div class="settings-row-copy">
+            <strong data-i18n="settings.appearance">Appearance</strong>
+            <span data-i18n="settings.appearanceDesc">Switch between dark and light theme.</span>
+          </div>
+        </div>
+        <div class="speed-seg" id="themeSeg" role="radiogroup" aria-label="Appearance">
+          <button type="button" class="speed-opt" data-theme-opt="dark" role="radio" aria-checked="false"><i class="fa-solid fa-moon"></i> Dark</button>
+          <button type="button" class="speed-opt" data-theme-opt="auto" role="radio" aria-checked="true"><i class="fa-solid fa-circle-half-stroke"></i> Auto</button>
+          <button type="button" class="speed-opt" data-theme-opt="light" role="radio" aria-checked="false"><i class="fa-solid fa-sun"></i> Light</button>
+        </div>
+
+        <div class="settings-row settings-speed-row">
+          <span class="settings-row-icon"><i class="fa-solid fa-language"></i></span>
+          <div class="settings-row-copy">
+            <strong data-i18n="settings.language">Language</strong>
+            <span data-i18n="settings.languageDesc">Choose display language.</span>
+          </div>
+        </div>
+        <div class="speed-seg" id="langSeg" role="radiogroup" aria-label="Language">
+          <button type="button" class="speed-opt" data-lang-opt="en" role="radio" aria-checked="false">English</button>
+          <button type="button" class="speed-opt" data-lang-opt="auto" role="radio" aria-checked="true">Auto</button>
+          <button type="button" class="speed-opt" data-lang-opt="id" role="radio" aria-checked="false">Indonesia</button>
+        </div>
+
+        <div class="settings-row settings-speed-row">
+          <span class="settings-row-icon"><i class="fa-solid fa-wave-square"></i></span>
+          <div class="settings-row-copy">
+            <strong data-i18n="settings.reduceMotion">Reduce motion</strong>
+            <span data-i18n="settings.reduceMotionDesc">Turns off entrance animations, wavy effects and hover motion.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="reduceMotionToggle" aria-label="Reduce motion">
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+
+        <div class="settings-row settings-speed-row">
+          <span class="settings-row-icon"><i class="fa-solid fa-camera"></i></span>
+          <div class="settings-row-copy">
+            <strong>Camera access</strong>
+            <span id="cameraStatusText">Opens the scanner camera for instant food scans.</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="cameraToggle" aria-label="Allow camera access">
+            <span class="switch-track"><span class="switch-thumb"></span></span>
+          </label>
+        </div>
+
+        <div class="settings-row settings-speed-row">
+          <span class="settings-row-icon"><i class="fa-solid fa-key"></i></span>
+          <div class="settings-row-copy">
+            <strong data-i18n="settings.hfToken">Food scanning API key</strong>
+            <span id="hfTokenStatus">Paste your Hugging Face token so the scanner can recognize food.</span>
+          </div>
+        </div>
+        <div class="hf-token-seg">
+          <input type="password" id="hfTokenInput" class="hf-token-input" placeholder="hf_..." autocomplete="off" spellcheck="false" aria-label="Hugging Face API key">
+        </div>
+
+        <div class="settings-row settings-speed-row">
+          <span class="settings-row-icon"><i class="fa-solid fa-bolt"></i></span>
+          <div class="settings-row-copy">
+            <strong>Animation speed</strong>
+            <span>Slow or fasten all animations and transitions.</span>
+          </div>
+        </div>
+        <div class="speed-seg" id="speedSeg" role="radiogroup" aria-label="Animation speed">
+          <button type="button" class="speed-opt" data-speed="1.7" role="radio" aria-checked="false" data-i18n="settings.slow">Slow</button>
+          <button type="button" class="speed-opt" data-speed="1" role="radio" aria-checked="true" data-i18n="settings.normal">Normal</button>
+          <button type="button" class="speed-opt" data-speed="0.4" role="radio" aria-checked="false" data-i18n="settings.fast">Fast</button>
+        </div>
+
+        <p class="settings-note"><i class="fa-solid fa-circle-info"></i>Your choice here overrides your device's own Reduce Motion setting.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="side-menu-footer">
+    <i class="fa-solid fa-shield-heart"></i>
+    <span data-i18n="menu.footerNote">Health information is for general education and is not a medical diagnosis.</span>
+  </div>
+</aside>
+
+<!-- =========================================================
+     HEALTH CHANNEL MODAL
+========================================================= -->
+<div id="healthModal" class="modal-overlay health-overlay">
+  <div class="health-card">
+    <div class="health-header">
+      <div class="modal-title">
+        <div class="health-modal-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+        <div>
+          <span class="health-eyebrow" data-i18n="health.eyebrow">ANC HEALTH CHANNEL</span>
+          <h3 data-i18n="features.card5Title">Health Channel</h3>
+          <span data-i18n="health.sub">Ideas, books, questions and a community for healthier living</span>
+        </div>
+      </div>
+      <button id="closeHealthBtn" class="close-btn" type="button" aria-label="Close health channel">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="health-intro">
+      <h2 data-i18n="health.introHeading">Learn. Share. <em>Get inspired.</em></h2>
+      <p data-i18n="health.introDesc">Discover inspiring ideas, books, community Q&A and real-world people stories that can turn self-improvement into practical next steps.</p>
+    </div>
+
+    <div class="health-topics">
+      <button class="health-topic active" data-health-filter="all" data-i18n="health.filterAll"><i class="fa-solid fa-border-all"></i> All</button>
+      <button class="health-topic" data-health-filter="inspirations" data-i18n="health.filterInsp"><i class="fa-solid fa-wand-magic-sparkles"></i> Inspirations</button>
+      <button class="health-topic" data-health-filter="books" data-i18n="health.filterBooks"><i class="fa-solid fa-book-open"></i> Inspirational Books</button>
+      <button class="health-topic" data-health-filter="qa" data-i18n="health.filterQA"><i class="fa-solid fa-circle-question"></i> Q&A</button>
+      <button class="health-topic" data-health-filter="forums" data-i18n="health.filterForums"><i class="fa-solid fa-comments"></i> Healthness Forums</button>
+      <button class="health-topic" data-health-filter="online" data-i18n="health.filterOnline"><i class="fa-solid fa-globe"></i> Online communities</button>
+      <button class="health-topic" data-health-filter="people" data-i18n="health.filterPeople"><i class="fa-solid fa-user-group"></i> People Inspiration</button>
+    </div>
+
+    <div class="health-feed" id="healthFeed">
+      <article class="health-article" data-health-category="inspirations">
+        <div class="health-article-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+        <div>
+          <span class="health-category">INSPIRATIONS</span>
+          <h4 data-i18n="health.a1Title">Make one healthy choice today</h4>
+          <p data-i18n="health.a1Desc">You don't need a perfect routine. Pick one small action today—drink water, take a walk, prepare a balanced meal, or rest.</p>
+          <button class="health-read-btn" data-health-chat="Give me three small, realistic healthy choices I can make today." data-i18n="health.askNoura">Ask Noura <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </article>
+
+      <article class="health-article" data-health-category="inspirations">
+        <div class="health-article-icon"><i class="fa-solid fa-lightbulb"></i></div>
+        <div>
+          <span class="health-category">INSPIRATIONS</span>
+          <h4 data-i18n="health.a2Title">Progress over perfection</h4>
+          <p data-i18n="health.a2Desc">Build habits you can repeat. A sustainable routine is often more useful than an extreme plan that is difficult to maintain.</p>
+          <button class="health-read-btn" data-health-chat="How can I stay motivated without trying to be perfect with my health?"><i class="fa-solid fa-robot"></i> Ask Noura</button>
+        </div>
+      </article>
+
+      <article class="health-article" data-health-category="books">
+        <div class="health-article-icon"><i class="fa-solid fa-book-open"></i></div>
+        <div>
+          <span class="health-category">INSPIRATIONAL BOOKS</span>
+          <h4 data-i18n="health.a3Title">Books that can change how you think about habits</h4>
+          <p data-i18n="health.a3Desc">Explore books about habits, mindset, behavior and personal growth. Use them as inspiration—not as a substitute for professional medical advice.</p>
+          <button class="health-read-btn" data-health-chat="Recommend inspirational books about healthy habits, mindset and personal growth." data-i18n="health.askNoura">Ask Noura <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </article>
+
+      <article class="health-article" data-health-category="books">
+        <div class="health-article-icon"><i class="fa-solid fa-book"></i></div>
+        <div>
+          <span class="health-category">INSPIRATIONAL BOOKS</span>
+          <h4 data-i18n="health.a4Title">Create your personal reading list</h4>
+          <p data-i18n="health.a4Desc">Save ideas from books that inspire you to improve your routines, resilience, self-awareness and relationship with health.</p>
+          <button class="health-read-btn" data-health-chat="Help me create a reading list about healthy habits and personal growth." data-i18n="health.buildList">Build a list <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </article>
+
+      <article class="health-article" data-health-category="qa">
+        <div class="health-article-icon"><i class="fa-solid fa-circle-question"></i></div>
+        <div>
+          <span class="health-category">Q&A</span>
+          <h4 data-i18n="health.a5Title">Ask questions without judgment</h4>
+          <p data-i18n="health.a5Desc">Have a question about everyday nutrition, habits or wellness? Ask Noura for a simple explanation or start a community discussion.</p>
+          <button class="health-read-btn" data-health-chat="I have a general health question and want a simple, easy-to-understand answer." data-i18n="health.askNoura">Ask Noura <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </article>
+
+      <article class="health-article" data-health-category="qa">
+        <div class="health-article-icon"><i class="fa-solid fa-comments"></i></div>
+        <div>
+          <span class="health-category">Q&A</span>
+          <h4 data-i18n="health.a6Title">Community questions</h4>
+          <p data-i18n="health.a6Desc">Browse questions from other ANC users and learn from different experiences, ideas and perspectives.</p>
+          <button class="health-read-btn" data-health-chat="Give me some useful health questions I can discuss with a community." data-i18n="health.getIdeas">Get question ideas <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </article>
+
+      <article class="health-article health-forum-feature" data-health-category="forums">
+        <div class="health-article-icon"><i class="fa-solid fa-comments"></i></div>
+        <div>
+          <span class="health-category">HEALTHNESS FORUMS</span>
+          <h4 data-i18n="health.a7Title">Join the Healthness community</h4>
+          <p data-i18n="health.a7Desc">Share experiences, ask questions, exchange ideas and encourage other people on their health journeys.</p>
+          <button class="health-read-btn" id="openForumBtn" data-i18n="health.openForum">Open forum <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </article>
+
+      <div id="peopleInspirationFeed" class="people-inspiration-feed" data-health-category="people"></div>
+
+      <div id="onlineForumFeed" class="people-inspiration-feed" data-health-category="online"></div>
+    </div>
+
+    <div id="forumPanel" class="forum-panel">
+      <div class="forum-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button id="forumBackBtn" class="forum-back" type="button" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button>
+          <div>
+            <span class="health-category">HEALTHNESS FORUMS</span>
+            <h3 data-i18n="forum.title">Talk with the community</h3>
+            <p data-i18n="forum.sub">Start a conversation or reply to a topic. Keep discussions respectful and supportive.</p>
+          </div>
+        </div>
+        <button id="closeForumBtn" class="forum-close" type="button" aria-label="Close forum"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="forum-channels">
+        <button class="forum-channel active" data-channel="all" data-i18n="forum.all"><i class="fa-solid fa-border-all"></i> All</button>
+        <button class="forum-channel" data-channel="nutrition" data-i18n="forum.chNutrition">🍎 Nutrition</button>
+        <button class="forum-channel" data-channel="fitness" data-i18n="forum.chFitness">💪 Fitness</button>
+        <button class="forum-channel" data-channel="wellness" data-i18n="forum.chWellness">🧘 Wellness</button>
+        <button class="forum-channel" data-channel="recipes" data-i18n="forum.chRecipes">🍳 Recipes</button>
+        <button class="forum-channel" data-channel="motivation" data-i18n="forum.chMotivation">✨ Motivation</button>
+      </div>
+
+      <div class="forum-search">
+        <input type="text" class="form-input" data-i18n-placeholder="forum.searchPlaceholder" placeholder="Search posts..." id="forum-search-input">
+      </div>
+
+      <div id="forumAdminNote" class="forum-admin-note" hidden></div>
+
+      <div class="forum-posts" id="forumPosts">
+        <article class="forum-post" data-forum-channel="motivation">
+          <div class="forum-post-left">
+            <button class="forum-vote up" title="Upvote"><i class="fa-solid fa-chevron-up"></i></button>
+            <span class="forum-vote-count">12</span>
+            <button class="forum-vote down" title="Downvote"><i class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="forum-avatar"><i class="fa-solid fa-seedling"></i></div>
+          <div class="forum-post-body">
+            <div class="forum-post-meta">
+              <strong>Healthy Habits</strong>
+              <span class="forum-post-channel-badge">Motivation</span>
+              <span class="forum-post-time">2h ago</span>
+            </div>
+            <h4 data-i18n="forum.p1Title">What's one healthy habit that actually stuck with you?</h4>
+            <p data-i18n="forum.p1Desc">Share a small habit that made a positive difference in your everyday routine.</p>
+            <div class="forum-post-tags">
+              <span class="tag-chip">habits</span>
+              <span class="tag-chip">routine</span>
+            </div>
+            <div class="forum-post-actions">
+              <button class="forum-react" data-react="heart"><i class="fa-solid fa-heart"></i> 8</button>
+              <button class="forum-reply" data-forum-question="What healthy habit has been easiest for you to maintain?">Reply with Noura <i class="fa-solid fa-arrow-right"></i></button>
+              <button class="forum-react" data-react="bookmark"><i class="fa-solid fa-bookmark"></i></button>
+            </div>
+          </div>
+        </article>
+
+        <article class="forum-post" data-forum-channel="wellness">
+          <div class="forum-post-left">
+            <button class="forum-vote up" title="Upvote"><i class="fa-solid fa-chevron-up"></i></button>
+            <span class="forum-vote-count">5</span>
+            <button class="forum-vote down" title="Downvote"><i class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="forum-avatar"><i class="fa-solid fa-book-open"></i></div>
+          <div class="forum-post-body">
+            <div class="forum-post-meta">
+              <strong>Book Club</strong>
+              <span class="forum-post-channel-badge">Wellness</span>
+              <span class="forum-post-time">5h ago</span>
+            </div>
+            <h4 data-i18n="forum.p2Title">Which health or personal-growth book inspired you?</h4>
+            <p data-i18n="forum.p2Desc">Recommend a book and tell the community what you liked about it.</p>
+            <div class="forum-post-tags">
+              <span class="tag-chip">books</span>
+              <span class="tag-chip">growth</span>
+            </div>
+            <div class="forum-post-actions">
+              <button class="forum-react" data-react="heart"><i class="fa-solid fa-heart"></i> 3</button>
+              <button class="forum-reply" data-forum-question="What inspirational health or personal-growth books should I read?">Ask Noura for ideas <i class="fa-solid fa-arrow-right"></i></button>
+              <button class="forum-react" data-react="bookmark"><i class="fa-solid fa-bookmark"></i></button>
+            </div>
+          </div>
+        </article>
+
+        <article class="forum-post" data-forum-channel="motivation">
+          <div class="forum-post-left">
+            <button class="forum-vote up" title="Upvote"><i class="fa-solid fa-chevron-up"></i></button>
+            <span class="forum-vote-count">9</span>
+            <button class="forum-vote down" title="Downvote"><i class="fa-solid fa-chevron-down"></i></button>
+          </div>
+          <div class="forum-avatar"><i class="fa-solid fa-heart"></i></div>
+          <div class="forum-post-body">
+            <div class="forum-post-meta">
+              <strong>Motivation</strong>
+              <span class="forum-post-channel-badge">Motivation</span>
+              <span class="forum-post-time">1d ago</span>
+            </div>
+            <h4 data-i18n="forum.p3Title">How do you stay motivated when progress feels slow?</h4>
+            <p data-i18n="forum.p3Desc">Share encouragement, strategies and realistic ways to keep moving forward.</p>
+            <div class="forum-post-tags">
+              <span class="tag-chip">motivation</span>
+              <span class="tag-chip">consistency</span>
+            </div>
+            <div class="forum-post-actions">
+              <button class="forum-react" data-react="heart"><i class="fa-solid fa-heart"></i> 15</button>
+              <button class="forum-reply" data-forum-question="How can I stay motivated when my health progress feels slow?" data-i18n="health.askNoura">Ask Noura <i class="fa-solid fa-arrow-right"></i></button>
+              <button class="forum-react" data-react="bookmark"><i class="fa-solid fa-bookmark"></i></button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="forum-compose">
+        <textarea id="forumPostInput" maxlength="500" data-i18n-placeholder="forum.composePlaceholder" placeholder="Start a new health discussion..." rows="2"></textarea>
+        <div class="forum-compose-footer">
+          <div class="forum-compose-options">
+            <select class="forum-channel-select" id="forumChannelSelect">
+              <option value="all">All</option>
+              <option value="nutrition">🍎 Nutrition</option>
+              <option value="fitness">💪 Fitness</option>
+              <option value="wellness">🧘 Wellness</option>
+              <option value="recipes">🍳 Recipes</option>
+              <option value="motivation">✨ Motivation</option>
+            </select>
+            <div class="forum-tags-input" id="forumTagsInput">
+              <div class="forum-tags-list" id="forumTagsList"></div>
+              <input type="text" class="forum-tag-input" data-i18n-placeholder="forum.tagPlaceholder" placeholder="Add tags (press Enter)" id="forumTagInput">
+            </div>
+          </div>
+          <button id="forumPostBtn" type="button" class="btn btn-primary" data-i18n="forum.postBtn"><i class="fa-solid fa-paper-plane"></i> Post</button>
+        </div>
+      </div>
+      <div id="forumStatus" class="forum-status"></div>
+    </div>
+
+    <div class="health-disclaimer">
+      <i class="fa-solid fa-circle-info"></i>
+      <span data-i18n="health.disclaimer">This channel is for general education and community discussion. It is not a substitute for professional medical advice, diagnosis or treatment.</span>
+    </div>
+  </div>
+</div>
+
+<!-- SCANNER MODAL -->
+<div id="scannerModal" class="modal-overlay">
+  <div class="scanner-card">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon"><i class="fa-solid fa-camera"></i></div>
+        <div><h3 data-i18n="scanner.title">AI Food Scanner</h3><span data-i18n="scanner.sub">Analyze your meal</span></div>
+      </div>
+      <button id="closeScannerBtn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="scanner-body">
+      <div class="image-dropzone" id="dropzone">
+        <img id="scannerImagePreview" src="" alt="Food preview">
+        <video id="cameraStream" autoplay playsinline></video>
+        <div id="dropzonePlaceholder" class="dropzone-placeholder">
+          <div class="upload-circle"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <strong data-i18n="scanner.uploadTitle">Upload a food photo</strong>
+          <span data-i18n="scanner.uploadSub">Click here or drag & drop an image</span>
+        </div>
+      </div>
+
+      <input type="file" id="scannerFileInput" accept="image/*" hidden>
+      <canvas id="captureCanvas" hidden></canvas>
+
+      <div class="scanner-actions">
+        <button id="uploadImageBtn" class="scanner-btn secondary" data-i18n="scanner.uploadBtn"><i class="fa-solid fa-upload"></i>Upload</button>
+        <button id="startCameraBtn" class="scanner-btn secondary" data-i18n="scanner.cameraBtn"><i class="fa-solid fa-camera"></i>Camera</button>
+        <button id="captureCameraBtn" class="scanner-btn secondary" style="display:none"><i class="fa-solid fa-circle-dot"></i>Snap</button>
+        <button id="runScanBtn" class="scanner-btn primary" disabled><i class="fa-solid fa-wand-magic-sparkles"></i>Scan</button>
+      </div>
+
+      <div id="scannerManualBox" class="scanner-manual" style="display:none">
+        <label data-i18n="scanner.manualLabel">Or type the food name</label>
+        <div class="weight-log-row"><input id="scannerFoodInput" type="text" data-i18n-placeholder="scanner.manualPlaceholder" placeholder="e.g. nasi goreng ayam" autocomplete="off"><button id="scannerManualBtn" class="scanner-btn primary" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> <span data-i18n="scanner.manualBtn">Analyze</span></button></div>
+      </div>
+
+      <div id="scannerResultBox" class="scanner-result" style="display:none">
+        <div class="result-heading" data-i18n="scanner.results"><i class="fa-solid fa-sparkles"></i>Analysis results</div>
+
+        <!-- NUTRITION WARNING BOXES -->
+        <div id="proteinWarningBox" class="protein-warning" style="display:none"></div>
+        <!-- SUGAR WARNING BOX -->
+        <div id="sugarWarningBox" class="sugar-warning" style="display:none"></div>
+
+        <div id="scannerResultText" class="result-text"></div>
+
+        <div id="macroChartWrap" class="macro-chart-wrap" style="display:none">
+          <div class="macro-donut" id="macroDonut">
+            <div class="macro-donut-hole"><strong id="macroCalories">0</strong><span>kcal</span></div>
+          </div>
+          <ul class="macro-legend" id="macroLegend"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPORT PREDICTOR MODAL -->
+<div id="sportModal" class="modal-overlay">
+  <div class="scanner-card">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon"><i class="fa-solid fa-person-running"></i></div>
+        <div><h3 data-i18n="sport.title">Sport Predictor</h3><span data-i18n="sport.sub">Estimate calories burned</span></div>
+      </div>
+      <button id="closeSportBtn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="scanner-body">
+      <div class="sport-field">
+  <label data-i18n="sport.activity">ACTIVITY</label>
+
+  <div class="sport-select-wrap">
+    <i class="fa-solid fa-person-running sport-select-icon"></i>
+
+    <select id="sportActivity" class="sport-select">
+      <option value="walking" data-i18n="sport.walking">Walking</option>
+      <option value="running" data-i18n="sport.running">Running</option>
+      <option value="hiking" data-i18n="sport.hiking">Hiking</option>
+      <option value="cycling" data-i18n="sport.cycling">Cycling</option>
+      <option value="swimming" data-i18n="sport.swimming">Swimming</option>
+    </select>
+
+    <div class="sport-select-arrow">
+      <i class="fa-solid fa-chevron-down"></i>
+    </div>
+  </div>
+</div>
+
+      <div class="sport-row">
+        <div class="sport-field" id="sportStepsField">
+          <label data-i18n="sport.steps">Steps</label>
+          <div class="auth-input">
+            <i class="fa-solid fa-shoe-prints"></i>
+            <input type="number" id="sportSteps" data-i18n-placeholder="sport.stepsPlaceholder" placeholder="e.g. 8000" min="0" step="1">
+          </div>
+        </div>
+        <div class="sport-field" id="sportDistanceField">
+          <label data-i18n="sport.distance">Distance (km)</label>
+          <div class="auth-input">
+            <i class="fa-solid fa-route"></i>
+            <input type="number" id="sportDistance" data-i18n-placeholder="sport.distancePlaceholder" placeholder="e.g. 5" min="0" step="0.1">
+          </div>
+        </div>
+      </div>
+      <span class="sport-hint" data-i18n="sport.hint">Fill in either steps or distance — the other is estimated automatically.</span>
+
+      <div class="sport-field">
+        <label data-i18n="auth.profile.weightLabel">Weight (kg) — optional</label>
+        <div class="auth-input">
+          <i class="fa-solid fa-weight-scale"></i>
+          <input type="number" id="sportWeight" placeholder="70" min="20" step="1">
+        </div>
+      </div>
+
+      <div class="scanner-actions">
+        <button id="runSportBtn" class="scanner-btn primary" data-i18n="sport.predictBtn"><i class="fa-solid fa-bolt"></i>Predict calories burned</button>
+      </div>
+
+      <div id="sportResultBox" class="scanner-result" style="display:none">
+        <div class="result-heading" data-i18n="sport.results"><i class="fa-solid fa-fire"></i>Prediction results</div>
+        <div id="sportResultText" class="result-text"></div>
+        <div id="sportStats" class="sport-stats"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEIGHT PROGRAM MODAL -->
+<div id="weightModal" class="modal-overlay weight-overlay">
+  <div class="weight-card">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon weight-icon"><svg class="kg-icon" viewBox="0 0 40 28" aria-hidden="true"><path d="M6 26 L10 4 L30 4 L34 26 Z" fill="currentColor"/><text x="20" y="19" text-anchor="middle" font-size="8.5" font-weight="800" fill="white" font-family="Inter,sans-serif">KG</text></svg></div>
+        <div><h3>Gain Or Loss Weight</h3><span>Your trainer Nolan — firm, motivating</span></div>
+      </div>
+      <button id="closeWeightBtn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="weight-body">
+      <div id="weightGoalStage">
+        <div id="weightNouraSuggest" class="weight-suggest"></div>
+        <div class="weight-goal-row">
+          <label><i class="fa-solid fa-bullseye"></i> Goal</label>
+          <div style="flex:1;min-width:0">
+            <select id="weightGoal">
+              <option value="" selected>Choose goal — Gain or Loss</option>
+              <option value="gain">Gain Weight — build mass, surplus</option>
+              <option value="loss">Loss Weight — cut fat, deficit</option>
+            </select>
+          </div>
+        </div>
+        <div class="weight-budget-row">
+          <label><i class="fa-solid fa-wallet"></i> Budget / day</label>
+          <select id="weightBudget" class="weight-budget-select"><option value="low">Low — &lt; Rp 20k</option><option value="mid" selected>Mid — Rp 20-50k</option><option value="high">High — &gt; Rp 50k</option></select>
+        </div>
+        <div class="weight-nolan-row">
+          <label><i class="fa-solid fa-robot"></i> Nolan Style</label>
+          <select id="weightNolanTone"><option value="firm">Tegas — Military</option><option value="balanced" selected>Natural — Balanced</option><option value="friendly">Ramah — Supportive</option></select>
+        </div>
+        <div class="scanner-actions"><button id="weightStartBtn" class="scanner-btn primary" type="button"><i class="fa-solid fa-bolt"></i> Start with Nolan</button></div>
+        <p class="weight-hint">Targets are personalised from your profile (age / weight / height / gender). You can change goal anytime.</p>
+      </div>
+      <div id="weightProgramStage" style="display:none">
+        <div class="weight-top">
+          <div class="weight-ring-wrap">
+            <div class="weight-ring" id="weightRing"><div class="weight-ring-hole"><strong id="weightRingPct">0%</strong><span id="weightRingKcal">0 / 0 kcal</span><small id="weightRingSub">today</small></div></div>
+            <div class="weight-streak" id="weightStreak"><i class="fa-solid fa-fire"></i> <span>0 day streak</span></div>
+          </div>
+          <div class="weight-targets">
+            <div class="weight-target-head"><strong id="weightGoalBadge">GAIN</strong> <span id="weightDayLabel">Day 1 — Balanced</span> <button id="weightSwitchBtn" class="weight-switch" type="button"><i class="fa-solid fa-shuffle"></i> Switch goal</button></div>
+            <div id="weightNolanMsg" class="weight-nolan-msg"></div>
+            <div class="weight-macro-bars" id="weightMacroBars"></div>
+            <div class="weight-budget-menus" id="weightMenuList"></div>
+          </div>
+        </div>
+        <div class="weight-log">
+          <label>Log what you ate — Nolan estimates & adds to progress</label>
+          <div class="weight-log-row"><input id="weightFoodInput" type="text" placeholder="e.g. nasi ayam 1 porsi, 2 telur rebus" autocomplete="off"><button id="weightAddBtn" class="scanner-btn primary" type="button"><i class="fa-solid fa-plus"></i> Add</button></div>
+          <div id="weightLogStatus" class="weight-log-status"></div>
+          <div id="weightLogList" class="weight-log-list"></div>
+        </div>
+        <div class="weight-actions-row"><button id="weightResetBtn" class="scanner-btn secondary" type="button"><i class="fa-solid fa-arrows-rotate"></i> Reset program</button><button id="weightAskNolanBtn" class="scanner-btn secondary" type="button"><i class="fa-solid fa-comments"></i> Ask Nolan</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI CHAT -->
+<button id="chatFab" class="chat-fab" type="button" aria-label="Chat with Noura" title="Chat with Noura"><i class="fa-solid fa-comment"></i><span class="chat-fab-dot"></span></button>
+<div id="chatWidget" class="chat-widget">
+  <div class="chat-header">
+    <div class="chat-title">
+      <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
+      <div><strong data-i18n="chat.name">Noura Assistant</strong><span>Aqal Nourishment Centre</span></div>
+    </div>
+    <button id="closeWidgetBtn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div id="chatMessages" class="chat-messages">
+    <div class="message ai-message" data-i18n="chat.greeting">Hello! I'm Noura. Ask me anything about nutrition, calories, meals or healthy habits.</div>
+  </div>
+
+  <div class="chat-input-box">
+    <input type="text" id="widgetChatInput" data-i18n-placeholder="chat.placeholder" placeholder="Ask Noura something...">
+    <button id="sendChatBtn"><i class="fa-solid fa-arrow-up"></i></button>
+  </div>
+</div>
+
+<!-- NOLAN CHAT — only available inside the weight program -->
+<button id="nolanFab" class="chat-fab nolan-fab" type="button" aria-label="Chat with Nolan" title="Chat with Nolan"><i class="fa-solid fa-person-running"></i><span class="chat-fab-dot"></span></button>
+<div id="nolanWidget" class="chat-widget nolan-widget">
+  <div class="chat-header">
+    <div class="chat-title">
+      <div class="chat-avatar nolan-avatar"><i class="fa-solid fa-person-running"></i></div>
+      <div><strong data-i18n="nolan.name">Nolan Trainer</strong><span data-i18n="nolan.sub">Weight program coach</span></div>
+    </div>
+    <button id="closeNolanBtn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div id="nolanChatMessages" class="chat-messages">
+    <div class="message ai-message" data-i18n="nolan.greeting">Nolan here. Ask about training, food, or your program — straight answers, zero excuses.</div>
+  </div>
+
+  <div class="chat-input-box">
+    <input type="text" id="nolanChatInput" data-i18n-placeholder="nolan.placeholder" placeholder="Ask Nolan something...">
+    <button id="nolanSendBtn"><i class="fa-solid fa-arrow-up"></i></button>
+  </div>
+</div>
+
+<!-- =========================================================
+     FOOTER / SOCIAL LINKS
+========================================================= -->
+<footer class="site-footer">
+  <div class="footer-brand">
+    <a href="#" class="brand">
+      <span class="brand-icon anc-logo"><img src="images/logo-dark.webp" alt="ANC Logo" class="logo-dark" width="32" height="32" loading="eager" onerror="this.onerror=null;this.src='images/logo-dark.jpg'"><img src="images/logo-light.webp" alt="ANC Logo" class="logo-light" width="32" height="32" loading="eager" onerror="this.onerror=null;this.src='images/logo-light.jpg'"></span>
+      <span>ANC</span>
+    </a>
+
+    <p data-i18n="footer.tagline">AI-powered nutrition, made simple.</p>
+  </div>
+
+  <div class="footer-social">
+    <a href="https://www.instagram.com/smpit_alqalam/?hl=en" class="social-icon" aria-label="Instagram" target="_blank" rel="noopener">
+      <i class="fa-brands fa-instagram"></i>
+    </a>
+
+    <a href="https://www.tiktok.com/@smpitalqalam" class="social-icon" aria-label="TikTok" target="_blank" rel="noopener">
+      <i class="fa-brands fa-tiktok"></i>
+    </a>
+
+    <a href="https://www.youtube.com/@alqalamchannel155" class="social-icon" aria-label="YouTube" target="_blank" rel="noopener">
+      <i class="fa-brands fa-youtube"></i>
+    </a>
+  </div>
+
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; 2026 ANC — Aqal Nourishment Centre</span>
+    <span class="footer-sigil">
+      <img src="images/LOGO_SIT-removebg-preview.png" alt="SMPIT Al Qalam" class="footer-logo" width="120" height="40" loading="lazy">
+    </span>
+    <span class="footer-tag" data-i18n="footer.powered">Powered by NOURA</span>
+  </div>
+</footer>
+
+<button id="backToTop" class="back-to-top" type="button" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
+<script src="js/script.js" defer></script>
+</body>
+</html>
